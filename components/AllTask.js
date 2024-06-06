@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 const AllTask = () => {
@@ -87,21 +88,23 @@ const AllTask = () => {
                   {note.description}
                 </p>
 
-                <div className="py-4 absolute bottom-0 left-0 w-full justify-center flex gap-12">
-                  <div className="py-3 flex items-center gap-4 px-4 bg-yellow-100 rounded-md text-[#111">
-                    <Image
-                      src="/edit-3-svgrepo-com.svg"
-                      alt="edit"
-                      width={25}
-                      height={25}
-                    />
-                    <span>Edit</span>
-                  </div>
+                <div className="py-4  absolute bottom-0 left-0 w-full justify-center flex gap-12">
+                  <Link href={`/EditNote/${note._id}`}>
+                    <div className="py-2 flex items-center gap-4 px-4 bg-yellow-100 rounded-md text-[#111">
+                      <Image
+                        src="/edit-3-svgrepo-com.svg"
+                        alt="edit"
+                        width={25}
+                        height={25}
+                      />
+                      <span>Edit</span>
+                    </div>
+                  </Link>
 
-                  <div className="py-3 flex items-center gap-4 px-4 bg-yellow-100 rounded-md text-[#111">
+                  <div className="py-2  flex items-center gap-4 px-4 bg-yellow-100 rounded-md text-[#111">
                     <button
                       onClick={() => handleDelete(note._id)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 flex items-center gap-4 hover:text-red-700"
                     >
                       <Image
                         src="/delete-button-svgrepo-com.svg"

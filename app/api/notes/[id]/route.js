@@ -1,34 +1,43 @@
 import connectDB from "@/back-end-utils/database";
 import Note from "@/back-end-utils/models/Note";
 
-export const DELETE = async (request, { params }) => {
+export const PATCH = async (request, { params }) => {
+  const { title, subject, date, description } = await request.json();
+
   try {
     await connectDB();
 
-    const { id } = params; // Extract the ID from the params
-    if (!id) {
-      return new Response("Note ID is required", { status: 400 });
-    }
+    // Find the existing note by ID
+    const existingNote = await Note.findById(params.id);
 
-    const deletedNote = await Note.findByIdAndRemove(id);
-    if (!deletedNote) {
+    if (!existingNote) {
       return new Response("Note not found", { status: 404 });
     }
 
-    return new Response("Note deleted successfully", { status: 200 });
+    // Update the note with new data
+    existingNote.title = title;
+    existingNote.subject = subject;
+    existingNote.date = date;
+    existingNote.description = description;
+
+    await existingNote.save();
+
+    return new Response("Successfully updated the note", { status: 200 });
   } catch (error) {
-    console.error("Error deleting note:", error);
-    return new Response("Error deleting note", { status: 500 });
+    console.error("Error updating note:", error);
+    return new Response("Error updating note", { status: 500 });
   }
 };
 
-export const GET = async (request) => {
+export const GET = async (request, { params }) => {
   try {
     await connectDB();
 
-    const notes = await Note.find().exec();
-    return new Response(JSON.stringify(notes), { status: 200 });
+    const prompt = await Note.findById(params.id).populate("creator");
+    if (!prompt) return new Response("Prompt Not Found", { status: 404 });
+
+    return new Response(JSON.stringify(prompt), { status: 200 });
   } catch (error) {
-    return new Response("Failed to fetch all notes", { status: 500 });
+    return new Response("Internal Server Error", { status: 500 });
   }
 };
