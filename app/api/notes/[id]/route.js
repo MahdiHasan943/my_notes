@@ -28,16 +28,16 @@ export const PATCH = async (request, { params }) => {
     return new Response("Error updating note", { status: 500 });
   }
 };
-
 export const GET = async (request, { params }) => {
   try {
     await connectDB();
 
-    const prompt = await Note.findById(params.id).populate("creator");
-    if (!prompt) return new Response("Prompt Not Found", { status: 404 });
+    const note = await Note.findById(params.id);
+    if (!note) return new Response("Note Not Found", { status: 404 });
 
-    return new Response(JSON.stringify(prompt), { status: 200 });
+    return new Response(JSON.stringify(note), { status: 200 });
   } catch (error) {
+    console.error(error); // Logging the error for debugging
     return new Response("Internal Server Error", { status: 500 });
   }
 };

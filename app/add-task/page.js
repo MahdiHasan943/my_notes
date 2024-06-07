@@ -11,10 +11,29 @@ const Page = () => {
     description: "",
   });
 
+  const [isOtherSubject, setIsOtherSubject] = useState(false);
+  const [otherSubject, setOtherSubject] = useState("");
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "subject" && value === "other") {
+      setIsOtherSubject(true);
+    } else {
+      if (name === "subject") {
+        setIsOtherSubject(false);
+      }
+      setForm({
+        ...form,
+        [name]: value,
+      });
+    }
+  };
+
+  const handleOtherSubjectChange = (e) => {
+    setOtherSubject(e.target.value);
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      subject: e.target.value,
     });
   };
 
@@ -34,6 +53,8 @@ const Page = () => {
         console.log("Note created successfully:", data);
         // Reset form or handle success state
         setForm({ title: "", subject: "", date: "", description: "" });
+        setIsOtherSubject(false);
+        setOtherSubject("");
         toast.success("Successfully created Note!");
       } else {
         console.error("Failed to create note");
@@ -75,7 +96,19 @@ const Page = () => {
                 <option value="math">Math</option>
                 <option value="physics">Physics</option>
                 <option value="biology">Biology</option>
+                <option value="other">Other</option>
               </select>
+
+              {isOtherSubject && (
+                <input
+                  type="text"
+                  name="otherSubject"
+                  placeholder="Enter subject"
+                  className="py-3 px-4 mb-4 rounded-md text-[#111] border border-gray-400 w-full"
+                  value={otherSubject}
+                  onChange={handleOtherSubjectChange}
+                />
+              )}
 
               <input
                 type="date"

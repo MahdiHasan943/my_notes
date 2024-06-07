@@ -5,8 +5,9 @@ import toast, { Toaster } from "react-hot-toast";
 
 const EditForm = ({ params }) => {
   const [notes, setNotes] = useState({});
+  const [isOtherSubject, setIsOtherSubject] = useState(false);
+  const [otherSubject, setOtherSubject] = useState("");
 
-  console.log(params.id);
   const [form, setForm] = useState({
     title: "",
     subject: "",
@@ -14,26 +15,50 @@ const EditForm = ({ params }) => {
     description: "",
   });
 
-  const fetchPosts = async () => {
-    const response = await fetch(`/api/notes`);
-    const data = await response.json();
-    setNotes(data);
+  const fetchNote = async () => {
+    try {
+      const response = await fetch(`/api/notes/${params.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setForm(data);
+        if (!["english", "math", "physics", "biology"].includes(data.subject)) {
+          setIsOtherSubject(true);
+          setOtherSubject(data.subject);
+        }
+      } else {
+        toast.error("Failed to fetch note details");
+      }
+    } catch (error) {
+      console.error("Error fetching note:", error);
+      toast.error("An error occurred while fetching the note details");
+    }
   };
 
-  console.log(notes);
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    fetchNote();
+  }, [params.id]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "subject" && value === "other") {
+      setIsOtherSubject(true);
+    } else {
+      if (name === "subject") {
+        setIsOtherSubject(false);
+      }
+      setForm({ ...form, [name]: value });
+    }
+  };
+
+  const handleOtherSubjectChange = (e) => {
+    setOtherSubject(e.target.value);
+    setForm({ ...form, subject: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await fetch(`/api/notes/${params?.id}`, {
+      const response = await fetch(`/api/notes/${params.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -84,7 +109,19 @@ const EditForm = ({ params }) => {
                 <option value="math">Math</option>
                 <option value="physics">Physics</option>
                 <option value="biology">Biology</option>
+                <option value="other">Other</option>
               </select>
+
+              {isOtherSubject && (
+                <input
+                  type="text"
+                  name="otherSubject"
+                  placeholder="Enter subject"
+                  className="py-3 px-4 mb-4 rounded-md text-[#111] border border-gray-400 w-full"
+                  value={otherSubject}
+                  onChange={handleOtherSubjectChange}
+                />
+              )}
 
               <input
                 type="date"
